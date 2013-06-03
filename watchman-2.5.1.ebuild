@@ -30,6 +30,8 @@ inherit autotools-utils
 DESCRIPTION="A file watching service."
 HOMEPAGE="https://github.com/facebook/watchman"
 
+MAKEOPTS+=" -j1"
+
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="git://github.com/facebook/watchman.git"
 	SRC_URI=""
