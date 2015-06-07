@@ -18,7 +18,7 @@ HOMEPAGE="http://nouveau.freedesktop.org/"
 KEYWORDS="amd64 ppc ppc64 x86"
 IUSE="glamor"
 
-RDEPEND=">=x11-libs/libdrm-2.4.34[video_cards_nouveau]
+RDEPEND=">=x11-libs/libdrm-2.4.60[video_cards_nouveau]
 	x11-base/xorg-server[glamor(-)?]"
 DEPEND="${RDEPEND}"
 
