@@ -22,9 +22,9 @@ RDEPEND=">=x11-libs/libdrm-2.4.60[video_cards_nouveau]
 	x11-base/xorg-server[glamor(-)?]"
 DEPEND="${RDEPEND}"
 
-#PATCHES=(
-#	"${FILESDIR}"/${P}-glamor-automagic.patch
-#)
+PATCHES=(
+	"${FILESDIR}"/${P}-glamor-automagic.patch
+)
 
 src_configure() {
 	XORG_CONFIGURE_OPTIONS="$(use_enable glamor)"
