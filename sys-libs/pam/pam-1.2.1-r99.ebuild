@@ -99,6 +99,8 @@ src_prepare() {
 	epatch "${FILESDIR}"/${PN}-1.2.1-innetgr.patch
 	epatch "${FILESDIR}"/${PN}-1.2.1-no-strndupa.patch
 
+	# disable insecure modules (musl-libc doesn't implement the functions anyway)
+	use elibc_musl && sed -e 's/pam_rhosts//g' -i modules/Makefile.am modules/Makefile.in
 	elibtoolize
 }
 
@@ -110,6 +112,9 @@ multilib_src_configure() {
 	# user to link libxcrypt in by default, since we won't track the
 	# dependency and allow to break PAM this way.
 	export ac_cv_header_xcrypt_h=no
+
+	# Disable automatic detection of libcrypt
+	use elibc_musl && export ac_cv_search_crypt=no
 
 	local myconf=(
 		--docdir='$(datarootdir)'/doc/${PF}
