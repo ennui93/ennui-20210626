@@ -1,0 +1,66 @@
+# Eliminate calls to error()/error.h, which are GNU extensions, not POSIX in order to compile with musl
+# See https://patchwork.freedesktop.org/patch/50793/
+
+diff --git a/configure.ac b/configure.ac
+index 263fc22..f52cd62 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -57,6 +57,8 @@ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
+ 	      [[#include <time.h>]])
+ AC_CHECK_HEADERS([execinfo.h])
+ 
++AC_CHECK_HEADERS([error.h])
++
+ AC_CHECK_FUNCS([mkostemp strchrnul initgroups posix_fallocate])
+ 
+ COMPOSITOR_MODULES="wayland-server >= 1.7.93 pixman-1 >= 0.25.2"
+diff --git a/src/weston-error.h b/src/weston-error.h
+new file mode 100644
+index 0000000..2089d02
+--- /dev/null
++++ b/src/weston-error.h
+@@ -0,0 +1,24 @@
+/* TODO
+   If S is zero error() will not exit so this macro should call warnx() in those cases
+   or just add a plain replacement function for error() to weston-launch.c */
+
++#ifndef WESTON_ERROR_H
++#define WESTON_ERROR_H
++
++#if HAVE_ERROR_H
++#include <error.h>
++#else
++#include <err.h>
++#include <string.h>
++#define weston_error(s, e, f, ...) do { \
++	if (e) \
++		errx((s), (f) ": %s", ##__VA_ARGS__, strerror(e)); \
++	else \
++		errx((s), (f), ##__VA_ARGS__); \
++} while(0)
++
++#define error weston_error
++#endif
++
++#endif
++
+diff --git a/src/weston-launch.c b/src/weston-launch.c
+index 10c66de..3e6d30a 100644
+--- a/src/weston-launch.c
++++ b/src/weston-launch.c
+@@ -30,7 +30,6 @@
+ #include <poll.h>
+ #include <errno.h>
+ 
+-#include <error.h>
+ #include <getopt.h>
+ 
+ #include <sys/types.h>
+@@ -56,6 +55,7 @@
+ #endif
+ 
+ #include "weston-launch.h"
++#include "weston-error.h"
+ 
+ #define DRM_MAJOR 226
+ 
