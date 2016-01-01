@@ -90,6 +90,8 @@ DEPEND="${RDEPEND}
 "
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-1.9.0-make-error-portable.patch
+
 	if [[ ${PV} = 9999* ]]; then
 		eautoreconf
 	fi
