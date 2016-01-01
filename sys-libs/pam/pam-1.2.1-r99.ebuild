@@ -95,6 +95,7 @@ src_unpack() {
 }
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-1.2.1-fix-compat.patch
 	epatch "${FILESDIR}"/${PN}-1.2.1-innetgr.patch
 	epatch "${FILESDIR}"/${PN}-1.2.1-no-strndupa.patch
 
