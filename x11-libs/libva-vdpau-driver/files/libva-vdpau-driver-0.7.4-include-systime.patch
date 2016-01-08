@@ -1,0 +1,10 @@
+--- ./libva-vdpau-driver-0.7.4/src/utils.c.orig	2016-01-08 19:41:43.264868224 +0000
++++ ./libva-vdpau-driver-0.7.4/src/utils.c	2016-01-08 19:42:16.607458827 +0000
+@@ -20,6 +20,7 @@
+ 
+ #include "sysdeps.h"
+ #include "utils.h"
++#include <sys/time.h>
+ #include <time.h>
+ #include <errno.h>
+ 
