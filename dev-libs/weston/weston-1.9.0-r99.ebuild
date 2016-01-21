@@ -12,7 +12,7 @@ fi
 VIRTUALX_REQUIRED="test"
 RESTRICT="test"
 
-inherit autotools readme.gentoo toolchain-funcs virtualx $GIT_ECLASS
+inherit autotools pax-utils readme.gentoo toolchain-funcs virtualx $GIT_ECLASS
 
 DESCRIPTION="Wayland reference compositor"
 HOMEPAGE="http://wayland.freedesktop.org/"
@@ -140,6 +140,8 @@ src_test() {
 }
 
 src_install() {
+	pax-mark -m "${ED}"/usr/bin/weston
+
 	default
 
 	readme.gentoo_src_install
