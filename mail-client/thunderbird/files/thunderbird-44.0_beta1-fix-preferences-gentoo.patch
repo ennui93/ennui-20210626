@@ -1,0 +1,10 @@
+--- a/mail/installer/package-manifest.in	2012-02-12 09:04:32.000000000 -0600
++++ b/mail/installer/package-manifest.in	2012-02-12 09:05:17.000000000 -0600
+@@ -336,6 +336,7 @@
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+ ; default pref files
++@RESPATH@/defaults/pref/all-gentoo.js
+ @RESPATH@/defaults/pref/all-thunderbird.js
+ @RESPATH@/defaults/pref/channel-prefs.js
+ @RESPATH@/defaults/pref/composer.js
