@@ -113,7 +113,6 @@ pkg_setup() {
 
 src_prepare() {
 	epatch \
-		"${FILESDIR}/${PN}-1.56.0-no-ssl3.patch" \
 		"${FILESDIR}/${PN}-1.51.0-respect_python-buildid.patch" \
 		"${FILESDIR}/${PN}-1.51.0-support_dots_in_python-buildid.patch" \
 		"${FILESDIR}/${PN}-1.48.0-no_strict_aliasing_python2.patch" \
@@ -121,8 +120,6 @@ src_prepare() {
 		"${FILESDIR}/${PN}-1.48.0-python_linking.patch" \
 		"${FILESDIR}/${PN}-1.48.0-disable_icu_rpath.patch" \
 		"${FILESDIR}/${PN}-1.55.0-context-x32.patch" \
-		"${FILESDIR}/${PN}-1.55.0-tools-c98-compat.patch" \
-		"${FILESDIR}/${PN}-1.52.0-threads.patch" \
 		"${FILESDIR}/${PN}-1.56.0-build-auto_index-tool.patch"
 
 	# Do not try to build missing 'wave' tool, bug #522682
