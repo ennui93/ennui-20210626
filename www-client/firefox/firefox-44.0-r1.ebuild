@@ -115,7 +115,7 @@ pkg_setup() {
 pkg_pretend() {
 	# Ensure we have enough disk space to compile
 	if use pgo || use debug || use test ; then
-		CHECKREQS_DISK_BUILD="8G"
+		CHECKREQS_DISK_BUILD="7G"
 	else
 		CHECKREQS_DISK_BUILD="4G"
 	fi
