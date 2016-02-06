@@ -15,12 +15,11 @@ SRC_URI="mirror://sourceforge/deng/Doomsday%20Engine/${PV}/${PN}-stable-${PV}.ta
 LICENSE="GPL-3+ LGPL-3+"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="dedicated fluidsynth openal snowberry +doom demo freedoom heretic hexen resources tools"
+IUSE="dedicated fluidsynth openal snowberry +doom heretic hexen tools"
 # we need python at build time, so
 # snowberry? ( ${PYTHON_REQUIRED_USE} )
 # could break the build
-REQUIRED_USE="${PYTHON_REQUIRED_USE}
-	demo? ( doom ) freedoom? ( doom ) resources? ( doom )"
+REQUIRED_USE="${PYTHON_REQUIRED_USE}"
 
 DEPEND="
 	dev-qt/qtnetwork:5
@@ -56,12 +55,6 @@ RDEPEND="${DEPEND}
 DEPEND="${DEPEND}
 	${PYTHON_DEPS}
 	virtual/pkgconfig"
-PDEPEND="
-	!dedicated? (
-		demo? ( games-fps/doom-data )
-		freedoom? ( games-fps/freedoom )
-		resources? ( games-fps/doomsday-resources )
-	)"
 
 S=${WORKDIR}/${PN}-stable-${PV}/${PN}
 
@@ -118,9 +111,6 @@ src_install() {
 	emake INSTALL_ROOT="${D}" install
 	dodoc "${S}"/../README.md
 
-	mv "${D}/${GAMES_DATADIR}"/{${PN}/data/jdoom,doom-data} || die
-	dosym "${GAMES_DATADIR}"/doom-data "${GAMES_DATADIR}"/${PN}/data/jdoom
-
 	if use !dedicated ; then
 		if use snowberry ; then
 			python_replicate_script "${D}"/"${GAMES_BINDIR}"/launch-doomsday
@@ -142,33 +132,18 @@ src_install() {
 		fi
 
 		if use doom; then
-			local res_arg
-
-			if use resources; then
-				res_arg="-def \"${GAMES_DATADIR}\"/${PN}/defs/jdoom/jDRP.ded"
-			fi
-
 			doicon ../snowberry/graphics/orb-doom.png
-			doom_make_wrapper jdoom doom1 orb-doom "DoomsDay Engine: Doom 1" "${res_arg}"
+			doom_make_wrapper jdoom doom1 orb-doom "DoomsDay Engine: Doom 1"
 			elog "Created jdoom launcher. To play Doom place your doom.wad to"
-			elog "\"${GAMES_DATADIR}\"/doom-data"
+			elog "${GAMES_DATADIR}/${PN}/data/jdoom"
 			elog
-
-			if use demo; then
-				doom_make_wrapper jdoom-demo doom1-share orb-doom "DoomsDay Engine: Doom 1 Demo" \
-					"-iwad \"${GAMES_DATADIR}\"/doom-data/doom1.wad ${res_arg}"
-			fi
-			if use freedoom; then
-				doom_make_wrapper jdoom-freedoom doom1-share orb-doom "DoomsDay Engine: FreeDoom" \
-					"-iwad \"${GAMES_DATADIR}\"/doom-data/freedoom/doom1.wad"
-			fi
 		fi
 		if use hexen; then
 			doicon ../snowberry/graphics/orb-hexen.png
 			doom_make_wrapper jhexen hexen orb-hexen "DoomsDay Engine: Hexen"
 
 			elog "Created jhexen launcher. To play Hexen place your hexen.wad to"
-			elog "\"${GAMES_DATADIR}\"/${PN}/data/jhexen"
+			elog "${GAMES_DATADIR}/${PN}/data/jhexen"
 			elog
 		fi
 		if use heretic; then
@@ -176,9 +151,11 @@ src_install() {
 			doom_make_wrapper jheretic heretic orb-heretic "DoomsDay Engine: Heretic"
 
 			elog "Created jheretic launcher. To play Heretic place your heretic.wad to"
-			elog "\"${GAMES_DATADIR}\"/${PN}/data/jheretic"
+			elog "${GAMES_DATADIR}/${PN}/data/jheretic"
 			elog
 		fi
+
+		elog "To launch resources to j* plugins, append '-def' to command-line."
 	fi
 
 	prepgamesdirs
