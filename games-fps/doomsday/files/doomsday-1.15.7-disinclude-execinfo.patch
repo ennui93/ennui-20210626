@@ -1,0 +1,11 @@
+--- libcore/include/de/libcore.h.orig	2016-02-06 08:14:12.259242092 +0100
++++ libcore/include/de/libcore.h	2016-02-06 08:15:10.415240044 +0100
+@@ -154,7 +154,7 @@
+ #endif
+ 
+ #ifdef DENG2_USE_QT
+-#  ifdef UNIX
++#  ifdef __GLIBC__
+ #    include <execinfo.h>
+ /**
+  * @macro DENG2_PRINT_BACKTRACE
