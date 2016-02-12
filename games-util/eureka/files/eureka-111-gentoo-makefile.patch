@@ -1,0 +1,66 @@
+--- eureka-1.11-source/Makefile.bak	2016-02-12 22:53:32.653241531 +0100
++++ eureka-1.11-source/Makefile	2016-02-12 22:53:52.227240841 +0100
+@@ -7,7 +7,7 @@
+ PROGRAM=eureka
+ 
+ # prefix choices: /usr  /usr/local  /opt
+-PREFIX=/usr/local
++PREFIX=$(DESTDIR)usr
+ 
+ OBJ_DIR=obj_linux
+ 
+@@ -23,15 +23,19 @@
+ 
+ INSTALL_DIR=$(PREFIX)/share/eureka
+ 
++FLTK_CXXFLAGS:=$(shell fltk-config --cxxflags)
++FLTK_LDFLAGS:=$(shell fltk-config --ldflags)
++
+ CXXFLAGS=$(OPTIMISE) -Wall -D$(OS)  \
+          -Iglbsp_src  \
+-         -D_THREAD_SAFE -D_REENTRANT
++         $(FLTK_CXXFLAGS)
+ 
+-LDFLAGS=-L/usr/X11R6/lib
++LDFLAGS=-L/usr/X11R6/lib  \
++        $(FLTK_LDFLAGS)
+ 
+ LIBS= \
+      -lfltk_images -lfltk_gl -lfltk  \
+-     -lX11 -lXext -lXft -lfontconfig -lXinerama  \
++     -lX11 -lXext -lXft -lfontconfig  \
+      -lpng -ljpeg -lGL -lz -lm
+ 
+ 
+@@ -46,7 +50,7 @@
+ LIBS= \
+      -lfltk_images -lfltk  \
+      -lfltk_png -lfltk_jpeg \
+-     -lX11 -lXext -lXft -lfontconfig -lXinerama \
++     -lX11 -lXext -lXft -lfontconfig \
+      -lz -lm
+ endif
+ 
+@@ -156,8 +160,9 @@
+ stripped: $(PROGRAM)
+ 	strip $(STRIP_FLAGS) $(PROGRAM)
+ 
+-install: stripped
+-	install -o root -m 755 $(PROGRAM) $(PREFIX)/bin/
++install:
++	install -d $(PREFIX)/bin/
++	install -D -o root -m 755 $(PROGRAM) $(PREFIX)/bin/
+ 	install -d $(INSTALL_DIR)/games
+ 	install -d $(INSTALL_DIR)/common
+ 	install -d $(INSTALL_DIR)/ports
+@@ -169,8 +174,8 @@
+ 	install -o root -m 644 common/*.* $(INSTALL_DIR)/common
+ 	install -o root -m 644 ports/*.* $(INSTALL_DIR)/ports
+ #	install -o root -m 644 mods/*.*  $(INSTALL_DIR)/mods
+-	xdg-desktop-menu  install --novendor misc/eureka.desktop
+-	xdg-icon-resource install --novendor --size 32 misc/eureka.xpm
++#	xdg-desktop-menu  install --novendor misc/eureka.desktop
++#	xdg-icon-resource install --novendor --size 32 misc/eureka.xpm
+ 
+ uninstall:
+ 	rm -v $(PREFIX)/bin/$(PROGRAM)
