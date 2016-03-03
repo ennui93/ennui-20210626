@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -44,7 +44,7 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~x86 ~amd64-linux ~x86-linu
 
 SLOT="0"
 LICENSE="MPL-2.0 GPL-2 LGPL-2.1"
-IUSE="bindist egl hardened +hwaccel pgo selinux +gmp-autoupdate test"
+IUSE="bindist hardened +hwaccel pgo selinux +gmp-autoupdate test"
 RESTRICT="!bindist? ( bindist )"
 
 # More URIs appended below...
@@ -57,7 +57,7 @@ ASM_DEPEND=">=dev-lang/yasm-1.1"
 
 # Mesa 7.10 needed for WebGL + bugfixes
 RDEPEND="
-	>=dev-libs/nss-3.20.1
+	>=dev-libs/nss-3.21
 	>=dev-libs/nspr-4.10.10-r1
 	selinux? ( sec-policy/selinux-mozilla )"
 
@@ -115,7 +115,7 @@ pkg_setup() {
 pkg_pretend() {
 	# Ensure we have enough disk space to compile
 	if use pgo || use debug || use test ; then
-		CHECKREQS_DISK_BUILD="7G"
+		CHECKREQS_DISK_BUILD="8G"
 	else
 		CHECKREQS_DISK_BUILD="4G"
 	fi
@@ -133,12 +133,16 @@ src_prepare() {
 	# Apply our patches
 	EPATCH_SUFFIX="patch" \
 	EPATCH_FORCE="yes" \
+	EPATCH_EXCLUDE="7005_dont-hardcode-libc-soname-in-python.patch" \
 	epatch "${WORKDIR}/firefox"
+
 	epatch "${FILESDIR}"/${PN}-44-qt-widget-fix.patch
 
 	# Fixes for MUSL
 	epatch "${FILESDIR}"/fix-xpcom.patch
-	epatch "${FILESDIR}"/${P}-remove-libevent-sysctl.patch
+	epatch "${FILESDIR}"/${PN}-44.0-remove-libevent-sysctl.patch
+	epatch "${FILESDIR}"/hardcode-musl-soname-in-python.patch
+	epatch "${FILESDIR}"/patch-xpcom_components_Module.h
 
 	# Allow user to apply any additional patches without modifing ebuild
 	epatch_user
@@ -211,7 +215,8 @@ src_configure() {
 	# Add full relro support for hardened
 	use hardened && append-ldflags "-Wl,-z,relro,-z,now"
 
-	use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
+	# EGL use flag removed for now, as build failures ensue with firefox-44
+	#use egl && mozconfig_annotate 'Enable EGL as GL provider' --with-gl-provider=EGL
 
 	# Setup api key for location services
 	echo -n "${_google_api_key}" > "${S}"/google-api-key
@@ -282,7 +287,7 @@ src_install() {
 
 	# Pax mark xpcshell for hardened support, only used for startupcache creation.
 	pax-mark m "${BUILD_OBJ_DIR}"/dist/bin/xpcshell
-	
+
 	# Add our default prefs for firefox
 	cp "${FILESDIR}"/gentoo-default-prefs.js-1 \
 		"${BUILD_OBJ_DIR}/dist/bin/browser/defaults/preferences/all-gentoo.js" \
