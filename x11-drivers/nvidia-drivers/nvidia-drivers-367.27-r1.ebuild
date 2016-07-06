@@ -1,4 +1,4 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2016 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -68,7 +68,7 @@ RDEPEND="
 	wayland? ( dev-libs/wayland )
 	X? (
 		<x11-base/xorg-server-1.18.99:=
-		>=x11-libs/libvdpau-0.3-r1
+		>=x11-libs/libvdpau-1.0
 		multilib? (
 			>=x11-libs/libX11-1.6.2[abi_x86_32]
 			>=x11-libs/libXext-1.3.2[abi_x86_32]
@@ -87,11 +87,11 @@ pkg_pretend() {
 		die "Unexpected \${DEFAULT_ABI} = ${DEFAULT_ABI}"
 	fi
 
-	if use kernel_linux && kernel_is ge 4 5; then
+	if use kernel_linux && kernel_is ge 4 7; then
 		ewarn "Gentoo supports kernels which are supported by NVIDIA"
 		ewarn "which are limited to the following kernels:"
-		ewarn "<sys-kernel/gentoo-sources-4.5"
-		ewarn "<sys-kernel/vanilla-sources-4.5"
+		ewarn "<sys-kernel/gentoo-sources-4.7"
+		ewarn "<sys-kernel/vanilla-sources-4.7"
 		ewarn ""
 		ewarn "You are free to utilize epatch_user to provide whatever"
 		ewarn "support you feel is appropriate, but will not receive"
@@ -196,7 +196,9 @@ src_compile() {
 			AR="$(tc-getAR)" \
 			CC="$(tc-getCC)" \
 			LIBDIR="$(get_libdir)" \
+			NV_VERBOSE=1 \
 			RANLIB="$(tc-getRANLIB)" \
+			DO_STRIP= \
 			build-xnvctrl
 
 		emake -C "${S}"/nvidia-settings-${PV}/src \
@@ -207,7 +209,7 @@ src_compile() {
 			NVML_ENABLED=0 \
 			NV_USE_BUNDLED_LIBJANSSON=0 \
 			NV_VERBOSE=1 \
-			STRIP_CMD=true
+			DO_STRIP=
 	fi
 }
 
@@ -358,8 +360,10 @@ src_install() {
 			DESTDIR="${D}" \
 			GTK3_AVAILABLE=$(usex gtk3 1 0) \
 			LIBDIR="${D}/usr/$(get_libdir)" \
-			PREFIX=/usr \
 			NV_USE_BUNDLED_LIBJANSSON=0 \
+			NV_VERBOSE=1 \
+			PREFIX=/usr \
+			DO_STRIP= \
 			install
 
 		if use static-libs; then
