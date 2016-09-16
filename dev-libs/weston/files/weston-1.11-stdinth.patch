@@ -1,0 +1,12 @@
+diff --git a/tests/string-test.c b/tests/string-test.c
+index a72ec30..76ed9fd 100644
+--- a/tests/string-test.c
++++ b/tests/string-test.c
+@@ -25,6 +25,7 @@
+ 
+ #include "config.h"
+ 
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <stdio.h>

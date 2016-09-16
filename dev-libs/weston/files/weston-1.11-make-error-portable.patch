@@ -1,0 +1,59 @@
+diff -Naur weston-9999.orig/configure.ac weston-9999/configure.ac
+--- weston-9999.orig/configure.ac	2016-09-10 07:48:34.245862655 +0000
++++ weston-9999/configure.ac	2016-09-10 07:50:33.030858472 +0000
+@@ -102,6 +102,8 @@
+ 	      [[#include <time.h>]])
+ AC_CHECK_HEADERS([execinfo.h])
+ 
++AC_CHECK_HEADERS([error.h])
++
+ AC_CHECK_FUNCS([mkostemp strchrnul initgroups posix_fallocate])
+ 
+ COMPOSITOR_MODULES="wayland-server >= $WAYLAND_PREREQ_VERSION pixman-1 >= 0.25.2"
+diff -Naur weston-9999.orig/libweston/weston-launch.c weston-9999/libweston/weston-launch.c
+--- weston-9999.orig/libweston/weston-launch.c	2016-09-10 07:48:34.273862654 +0000
++++ weston-9999/libweston/weston-launch.c	2016-09-10 07:51:07.096857273 +0000
+@@ -33,7 +33,6 @@
+ #include <poll.h>
+ #include <errno.h>
+ 
+-#include <error.h>
+ #include <getopt.h>
+ 
+ #include <sys/types.h>
+@@ -59,6 +58,7 @@
+ #endif
+ 
+ #include "weston-launch.h"
++#include "weston-error.h"
+ 
+ #define DRM_MAJOR 226
+ 
+diff -Naur weston-9999.orig/src/weston-error.h weston-9999/src/weston-error.h
+--- weston-9999.orig/libweston/weston-error.h	1970-01-01 00:00:00.000000000 +0000
++++ weston-9999/libweston/weston-error.h	2016-09-10 07:50:33.032858472 +0000
+@@ -0,0 +1,24 @@
++/* TODO
++   If S is zero error() will not exit so this macro should call warnx() in those cases
++   or just add a plain replacement function for error() to weston-launch.c */
++
++#ifndef WESTON_ERROR_H
++#define WESTON_ERROR_H
++
++#if HAVE_ERROR_H
++#include <error.h>
++#else
++#include <err.h>
++#include <string.h>
++#define weston_error(s, e, f, ...) do { \
++	if (e) \
++		errx((s), (f), ##__VA_ARGS__, strerror(e)); \
++	else \
++		errx((s), (f), ##__VA_ARGS__); \
++} while(0)
++
++#define error weston_error
++#endif
++
++#endif
++
