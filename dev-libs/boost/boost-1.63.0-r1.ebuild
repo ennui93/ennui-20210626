@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -16,9 +16,7 @@ SRC_URI="https://downloads.sourceforge.net/project/boost/${PN}/${PV}/${MY_P}.tar
 
 LICENSE="Boost-1.0"
 SLOT="0/${PV}" # ${PV} instead ${MAJOR_V} due to bug 486122
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh \
-	~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos \
-	~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x86-solaris ~x86-winnt"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~x86 ~ppc-aix ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x86-solaris ~x86-winnt"
 
 IUSE="context debug doc icu +nls mpi python static-libs +threads tools"
 
@@ -45,15 +43,11 @@ S="${WORKDIR}/${MY_P}"
 RESTRICT="test"
 
 PATCHES=(
-	"${FILESDIR}/${PN}-1.51.0-respect_python-buildid.patch"
-	"${FILESDIR}/${PN}-1.51.0-support_dots_in_python-buildid.patch"
-	"${FILESDIR}/${PN}-1.48.0-no_strict_aliasing_python2.patch"
-	"${FILESDIR}/${PN}-1.48.0-disable_libboost_python3.patch"
-	"${FILESDIR}/${PN}-1.48.0-python_linking.patch"
 	"${FILESDIR}/${PN}-1.48.0-disable_icu_rpath.patch"
 	"${FILESDIR}/${PN}-1.55.0-context-x32.patch"
 	"${FILESDIR}/${PN}-1.56.0-build-auto_index-tool.patch"
 	"${FILESDIR}/${PN}-1.62.0-libressl.patch"
+	"${FILESDIR}/${PN}-1.63.0-fix-python.patch"
 )
 
 python_bindings_needed() {
@@ -189,6 +183,7 @@ src_configure() {
 			--without-context
 			--without-coroutine
 			--without-coroutine2
+			--without-fiber
 		)
 	use threads || OPTIONS+=(
 			--without-thread
