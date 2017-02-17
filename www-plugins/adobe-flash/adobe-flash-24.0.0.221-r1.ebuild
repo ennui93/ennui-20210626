@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Id$
 
@@ -49,7 +49,7 @@ NPAPI_RDEPEND="
 		dev-qt/qtdbus:4
 		dev-qt/qtgui:4
 		dev-qt/qtsvg:4
-		kde-base/kdelibs
+		kde-frameworks/kdelibs:4
 		x11-libs/libICE
 		x11-libs/libSM
 		x11-libs/libXau
