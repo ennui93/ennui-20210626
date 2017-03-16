@@ -1,6 +1,5 @@
 # Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
 EAPI=6
 inherit nsplugins multilib multilib-minimal
@@ -18,7 +17,7 @@ AF_NP_64_URI="${AF_URI}/flash_player_npapi_linux.x86_64.tar.gz -> ${P}-npapi.x86
 AF_PP_32_URI="${AF_URI}/flash_player_ppapi_linux.i386.tar.gz -> ${P}-ppapi.i386.tar.gz"
 AF_PP_64_URI="${AF_URI}/flash_player_ppapi_linux.x86_64.tar.gz -> ${P}-ppapi.x86_64.tar.gz"
 
-IUSE="kde +nsplugin +ppapi"
+IUSE="+nsplugin +ppapi"
 REQUIRED_USE="
 	|| ( nsplugin ppapi )
 "
@@ -44,20 +43,6 @@ NPAPI_RDEPEND="
 	dev-libs/glib:2
 	dev-libs/nspr
 	dev-libs/nss
-	kde? (
-		dev-qt/qtcore:4
-		dev-qt/qtdbus:4
-		dev-qt/qtgui:4
-		dev-qt/qtsvg:4
-		kde-frameworks/kdelibs:4
-		x11-libs/libICE
-		x11-libs/libSM
-		x11-libs/libXau
-		x11-libs/libXdmcp
-		x11-libs/libXext
-		x11-libs/libXft
-		x11-libs/libXpm
-	)
 	media-libs/fontconfig
 	media-libs/freetype
 	x11-libs/cairo
@@ -109,16 +94,10 @@ multilib_src_install() {
 		doexe libflashplayer.so
 
 		if multilib_is_native_abi; then
-			if use kde; then
-				exeinto /usr/$(get_libdir)/kde4
-				doexe usr/${pkglibdir}/kde4/kcm_adobe_flash_player.so
-				insinto /usr/share/kde4/services
-				doins usr/share/kde4/services/kcm_adobe_flash_player.desktop
-			else
-				# No KDE applet, so allow the GTK utility to show up in KDE:
-				sed -i usr/share/applications/flash-player-properties.desktop \
-					-e "/^NotShowIn=KDE;/d" || die "sed of .desktop file failed"
-			fi
+			# No KDE applet, so allow the GTK utility to show up in KDE:
+			sed \
+				-i usr/share/applications/flash-player-properties.desktop \
+				-e "/^NotShowIn=KDE;/d" || die
 
 			# The userland 'flash-player-properties' standalone app:
 			dobin usr/bin/flash-player-properties
@@ -136,14 +115,14 @@ multilib_src_install() {
 	fi
 
 	if use ppapi; then
-		exeinto /usr/$(get_libdir)/chromium-browser/PepperFlash
+		exeinto /usr/$(get_libdir)/chromium/PepperFlash
 		doexe libpepflashplayer.so
-		insinto /usr/$(get_libdir)/chromium-browser/PepperFlash
+		insinto /usr/$(get_libdir)/chromium/PepperFlash
 		doins manifest.json
 
 		if multilib_is_native_abi; then
 			dodir /etc/chromium
-			sed "${FILESDIR}"/pepper-flash \
+			sed "${FILESDIR}"/pepper-flash-r1 \
 				-e "s|@FP_LIBDIR@|$(get_libdir)|g" \
 				-e "s|@FP_PV@|${PV}|g" \
 				> "${D}"/etc/chromium/pepper-flash \
