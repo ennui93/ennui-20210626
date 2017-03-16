@@ -5,7 +5,15 @@ EAPI="6"
 
 DESCRIPTION="Tools for manipulating UEFI secure boot platforms"
 HOMEPAGE="https://git.kernel.org/cgit/linux/kernel/git/jejb/efitools.git"
-SRC_URI="https://git.kernel.org/cgit/linux/kernel/git/jejb/efitools.git/snapshot/v${PV}.tar.bz2 -> ${P}.tar.bz2"
+
+if [[ ${PV} == "9999" ]]; then
+	inherit git-r3
+	EGIT_REPO_URI="https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git"
+else
+	SRC_URI="https://git.kernel.org/cgit/linux/kernel/git/jejb/efitools.git/snapshot/v${PV}.tar.bz2 -> ${P}.tar.bz2"
+	S=${WORKDIR}/v${PV}
+fi
+
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -22,10 +30,3 @@ DEPEND="${RDEPEND}
 	app-crypt/sbsigntool
 	virtual/pkgconfig
 	dev-perl/File-Slurp"
-
-S=${WORKDIR}/v${PV}
-
-src_prepare() {
-	default
-	cd "${S}/lib/asn1" || die && perl oid.pl
-}
