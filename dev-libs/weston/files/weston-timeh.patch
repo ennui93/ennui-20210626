@@ -1,0 +1,12 @@
+diff --git a/shared/timespec-util.h b/shared/timespec-util.h
+index 576b3e8f..34a120ae 100644
+--- a/shared/timespec-util.h
++++ b/shared/timespec-util.h
+@@ -28,6 +28,7 @@
+ 
+ #include <stdint.h>
+ #include <assert.h>
++#include <time.h>
+ 
+ #define NSEC_PER_SEC 1000000000
+ 

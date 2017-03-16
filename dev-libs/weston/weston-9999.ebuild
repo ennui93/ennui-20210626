@@ -1,8 +1,7 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2017 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Id$
 
-EAPI=5
+EAPI=6
 
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="git://anongit.freedesktop.org/git/wayland/${PN}"
@@ -28,8 +27,7 @@ fi
 LICENSE="MIT CC-BY-SA-3.0"
 SLOT="0"
 
-IUSE_VIDEO_CARDS="video_cards_intel video_cards_v4l"
-IUSE="colord dbus +drm editor examples fbdev +gles2 headless ivi jpeg lcms rdp +resize-optimization rpi +launch screen-sharing static-libs +suid systemd test unwind wayland-compositor webp +X xwayland ${IUSE_VIDEO_CARDS}"
+IUSE="colord dbus +drm editor examples fbdev +gles2 headless ivi jpeg +launch lcms rdp +resize-optimization screen-sharing static-libs +suid systemd test unwind wayland-compositor webp +X xwayland"
 
 REQUIRED_USE="
 	drm? ( gles2 )
@@ -41,7 +39,7 @@ REQUIRED_USE="
 
 RDEPEND="
 	>=dev-libs/libinput-0.8.0
-	>=dev-libs/wayland-1.10.0
+	>=dev-libs/wayland-1.12.0
 	>=dev-libs/wayland-protocols-1.2
 	lcms? ( media-libs/lcms:2 )
 	media-libs/libpng:0=
@@ -68,10 +66,6 @@ RDEPEND="
 		media-libs/mesa[gles2,wayland]
 	)
 	rdp? ( >=net-misc/freerdp-1.1.0_beta1_p20130710 )
-	rpi? (
-		>=sys-libs/mtdev-1.1.0
-		>=virtual/udev-136
-	)
 	systemd? (
 		sys-auth/pambase[systemd]
 		sys-apps/systemd[pam]
@@ -93,13 +87,20 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig
 "
 
+PATCHES=(
+	"${FILESDIR}/${PN}-1.11-make-error-portable.patch"
+	"${FILESDIR}/${PN}-1.11-stdinth.patch"
+	"${FILESDIR}/${PN}-timeh.patch"
+	)
+
+
 src_prepare() {
+	default
 	if [[ ${PV} = 9999* ]]; then
 		eautoreconf
+	else
+		elibtoolize
 	fi
-
-	epatch "${FILESDIR}"/${PN}-1.11-make-error-portable.patch
-	epatch "${FILESDIR}"/${PN}-1.11-stdinth.patch
 }
 
 src_configure() {
@@ -121,7 +122,6 @@ src_configure() {
 		$(use_enable ivi ivi-shell) \
 		$(use_enable lcms) \
 		$(use_enable rdp rdp-compositor) \
-		$(use_enable rpi rpi-compositor) \
 		$(use_enable wayland-compositor) \
 		$(use_enable X x11-compositor) \
 		$(use_enable launch weston-launch) \
@@ -135,10 +135,10 @@ src_configure() {
 		$(use_enable systemd systemd-notify) \
 		$(use_enable xwayland) \
 		$(use_enable xwayland xwayland-test) \
-		$(use_enable video_cards_intel simple-dmabuf-intel-client) \
-		$(use_enable video_cards_v4l simple-dmabuf-v4l-client) \
 		$(use_with jpeg) \
 		$(use_with webp) \
+		--disable-simple-dmabuf-intel-client \
+		--disable-simple-dmabuf-v4l-client \
 		${myconf}
 }
 
@@ -148,7 +148,7 @@ src_test() {
 	chmod 0700 "${XDG_RUNTIME_DIR}" || die
 
 	cd "${BUILD_DIR}" || die
-	Xemake check
+	virtx emake check
 }
 
 src_install() {
