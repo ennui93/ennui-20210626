@@ -155,4 +155,7 @@ src_install() {
 	default
 
 	readme.gentoo_create_doc
+
+	insinto /etc/xdg/weston
+	doins weston.ini
 }
