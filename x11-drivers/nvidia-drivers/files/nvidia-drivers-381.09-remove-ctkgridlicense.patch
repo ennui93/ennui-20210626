@@ -1,0 +1,18 @@
+--- a/nvidia-settings-381.09/src/src.mk	2017-03-31 05:55:30.000000000 +0200
++++ b/nvidia-settings-381.09/src/src.mk	2017-02-08 06:12:00.000000000 +0100
+@@ -221,7 +221,6 @@
+ GTK_SRC += gtk+-2.x/ctkcolorcontrols.c
+ GTK_SRC += gtk+-2.x/ctk3dvisionpro.c
+ GTK_SRC += gtk+-2.x/ctkvdpau.c
+-GTK_SRC += gtk+-2.x/ctkgridlicense.c
+ 
+ 
+ GTK_EXTRA_DIST += gtk+-2.x/ctkxvideo.h
+@@ -269,7 +268,6 @@
+ GTK_EXTRA_DIST += gtk+-2.x/ctkcolorcontrols.h
+ GTK_EXTRA_DIST += gtk+-2.x/ctk3dvisionpro.h
+ GTK_EXTRA_DIST += gtk+-2.x/ctkvdpau.h
+-GTK_EXTRA_DIST += gtk+-2.x/ctkgridlicense.h
+ 
+ NVIDIA_SETTINGS_EXTRA_DIST += $(GTK_EXTRA_DIST)
+ 
