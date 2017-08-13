@@ -1,0 +1,26 @@
+--- work/GNUmakefile.orig	2017-08-13 14:52:02.440273797 +0200
++++ work/GNUmakefile	2017-08-13 14:53:56.498511481 +0200
+@@ -12,7 +12,6 @@
+ CHMOD ?= chmod
+ MKDIR ?= mkdir
+ LN ?= ln -sf
+-LDCONF ?= /sbin/ldconfig -n
+ UNAME := $(shell uname)
+ 
+ IS_X86 := $(shell uname -m | $(EGREP) -v "x86_64" | $(EGREP) -i -c "i.86|x86|i86")
+@@ -598,7 +597,6 @@
+ 	-$(CHMOD) 0755 $(DESTDIR)$(LIBDIR)/libcryptopp.so$(SOLIB_VERSION_SUFFIX)
+ ifeq ($(HAS_SOLIB_VERSION),1)
+ 	-$(LN) -sf libcryptopp.so$(SOLIB_VERSION_SUFFIX) $(DESTDIR)$(LIBDIR)/libcryptopp.so
+-	$(LDCONF) $(DESTDIR)$(LIBDIR)
+ endif
+ endif
+ 
+@@ -615,7 +613,6 @@
+ ifeq ($(HAS_SOLIB_VERSION),1)
+ 	-$(RM) $(DESTDIR)$(LIBDIR)/libcryptopp.so$(SOLIB_COMPAT_SUFFIX)
+ 	-$(RM) $(DESTDIR)$(LIBDIR)/libcryptopp.so
+-	$(LDCONF) $(DESTDIR)$(LIBDIR)
+ endif
+ endif
+ 
