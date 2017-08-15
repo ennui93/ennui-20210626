@@ -1,0 +1,8 @@
+--- work/src/cpp-utils/system/get_total_memory.cpp.orig	2017-08-15 21:18:33.783934965 +0200
++++ work/src/cpp-utils/system/get_total_memory.cpp	2017-08-15 21:18:42.216083887 +0200
+@@ -1,5 +1,4 @@
+ #include "get_total_memory.h"
+-#include <sys/sysctl.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <stdexcept>

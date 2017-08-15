@@ -1,0 +1,30 @@
+--- work/vendor/spdlog/spdlog/details/os.h.orig	2017-02-11 13:34:50.000000000 +0100
++++ work/vendor/spdlog/spdlog/details/os.h	2017-08-13 16:39:38.763956751 +0200
+@@ -329,6 +329,17 @@
+ }
+ #endif
+ 
++inline std::string errno_to_string(char [256], char* res) {
++    return std::string(res);
++}
++    
++inline std::string errno_to_string(char buf[256], int res) {
++    if (res == 0) {
++        return std::string(buf);
++    } else {
++        return "Unknown error";
++    }
++}
+ 
+ // Return errno string (thread safe)
+ inline std::string errno_str(int err_num)
+@@ -351,7 +362,8 @@
+         return "Unkown error";
+ 
+ #else  // gnu version (might not use the given buf, so its retval pointer must be used)
+-    return std::string(strerror_r(err_num, buf, buf_size));
++    auto err = strerror_r(err_num, buf, buf_size); // let compiler choose type
++    return errno_to_string(buf, err); // use overloading to select correct stringify function
+ #endif
+ }
+ 

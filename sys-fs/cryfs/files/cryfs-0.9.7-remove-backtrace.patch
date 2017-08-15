@@ -1,0 +1,31 @@
+--- work/src/cpp-utils/assert/backtrace.cpp.orig	2017-08-15 21:41:46.508496642 +0200
++++ work/src/cpp-utils/assert/backtrace.cpp	2017-08-15 21:42:33.899016210 +0200
+@@ -1,5 +1,4 @@
+ #include "backtrace.h"
+-#include <execinfo.h>
+ #include <signal.h>
+ #include <iostream>
+ #include <unistd.h>
+@@ -40,21 +39,10 @@
+         return demangle(backtraceLine.substr(startMangledName+1, endMangledName-startMangledName-1)) + ": (" + backtraceLine.substr(0, startMangledName) + backtraceLine.substr(endMangledName);
+     }
+ 
+-    string backtrace_to_string(void *array[], size_t size) {
+-        ostringstream result;
+-        char **ptr = backtrace_symbols(array, size);
+-        for (size_t i = 0; i < size; ++i) {
+-            result << pretty(ptr[i]) << "\n";
+-        }
+-        free(ptr);
+-        return result.str();
+-    }
+-
+     string backtrace() {
+         constexpr unsigned int MAX_SIZE = 100;
+         void *array[MAX_SIZE];
+-        size_t size = ::backtrace(array, MAX_SIZE);
+-        return backtrace_to_string(array, size);
++	return "backtrace not implemented.";
+     }
+ 
+     void sigsegv_handler(int) {

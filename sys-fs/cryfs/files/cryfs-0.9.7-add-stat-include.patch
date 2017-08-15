@@ -1,0 +1,10 @@
+--- work/src/fspp/fs_interface/Dir.h.orig	2017-08-15 21:33:07.095670957 +0200
++++ work/src/fspp/fs_interface/Dir.h	2017-08-15 21:33:19.341887249 +0200
+@@ -4,6 +4,7 @@
+ 
+ #include <cpp-utils/pointer/unique_ref.h>
+ #include <string>
++#include <sys/stat.h>
+ #include <boost/filesystem/path.hpp>
+ 
+ namespace fspp {
