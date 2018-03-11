@@ -121,7 +121,7 @@ RDEPEND="
 	)
 	vdpau? ( >=x11-libs/libvdpau-1.1:=[${MULTILIB_USEDEP}] )
 	wayland? (
-		>=dev-libs/wayland-1.11.0:=[${MULTILIB_USEDEP}]
+		>=dev-libs/wayland-9999:=[${MULTILIB_USEDEP}]
 		>=dev-libs/wayland-protocols-1.8
 	)
 	xvmc? ( >=x11-libs/libXvMC-1.0.8:=[${MULTILIB_USEDEP}] )
@@ -473,6 +473,8 @@ multilib_src_install() {
 		doenvd "${T}"/99mesaxdgomx
 		keepdir /usr/share/mesa/xdg
 	fi
+
+	rm /var/tmp/portage/media-libs/mesa-9999/image/usr/lib/libwayland-egl.so* /var/tmp/portage/media-libs/mesa-9999/image/usr/lib/pkgconfig/wayland-egl.pc
 }
 
 multilib_src_install_all() {
