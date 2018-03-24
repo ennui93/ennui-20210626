@@ -86,10 +86,9 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES=(
+	"${FILESDIR}"/${PV}-musl.patch
 	"${FILESDIR}/${PN}-1.11-make-error-portable.patch"
-	"${FILESDIR}/${PN}-1.11-stdinth.patch"
-	)
-
+)
 
 src_prepare() {
 	default
@@ -154,7 +153,4 @@ src_install() {
 	default
 
 	readme.gentoo_create_doc
-
-	insinto /etc/xdg/weston
-	doins weston.ini
 }
