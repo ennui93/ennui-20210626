@@ -289,6 +289,7 @@ src_prepare() {
 	eapply "${FILESDIR}"/${PN}-18-execinfo.patch
 	eapply "${FILESDIR}"/${PN}-17-musl-invocation_name.patch
 	eapply "${FILESDIR}"/${PN}-18-musl-pthread.patch
+	eapply "${FILESDIR}"/${PN}-18-musl-increase-pthread-stack-size.patch
 
 	eautoreconf
 
