@@ -3,6 +3,8 @@
 
 EAPI=6
 
+WANT_AUTOMAKE=1.15
+
 if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="https://anongit.freedesktop.org/git/wayland/${PN}.git"
 	GIT_ECLASS="git-r3"
