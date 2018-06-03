@@ -38,3 +38,14 @@ diff -Naur mesa-18.0.0-rc2.orig/src/util/u_thread.h mesa-18.0.0-rc2/src/util/u_t
     return pthread_equal(pthread_self(), thread);
  #  endif
  #endif
+diff -u mesa-18.1.0/src/amd/vulkan/winsys/amdgpu/radv_amdgpu_winsys.h{.orig,}
+--- mesa-18.1.0/src/amd/vulkan/winsys/amdgpu/radv_amdgpu_winsys.h.orig	2018-05-21 12:18:17.572276918 +0200
++++ mesa-18.1.0/src/amd/vulkan/winsys/amdgpu/radv_amdgpu_winsys.h	2018-05-21 12:18:27.223270274 +0200
+@@ -28,6 +28,7 @@
+ #ifndef RADV_AMDGPU_WINSYS_H
+ #define RADV_AMDGPU_WINSYS_H
+ 
++#include <pthread.h>
+ #include "radv_radeon_winsys.h"
+ #include "ac_gpu_info.h"
+ #include "addrlib/addrinterface.h"
