@@ -1,0 +1,27 @@
+From 4f74c44f0b3cf992e364b2776367ba91c9d13599 Mon Sep 17 00:00:00 2001
+From: Nicholas Fish <github@seaofdirac.net>
+Date: Sat, 21 Jul 2018 16:42:46 +0200
+Subject: [PATCH] Fix compilation on systems that don't yet support IDN
+
+---
+ ping.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ping.c b/ping.c
+index 733477f..b241815 100644
+--- a/ping.c
++++ b/ping.c
+@@ -207,9 +207,9 @@ main(int argc, char **argv)
+ 
+ #ifdef USE_IDN
+ 	setlocale(LC_ALL, "");
+-#endif
+ 	if (!strcmp(setlocale(LC_ALL, NULL), "C"))
+ 		hints.ai_flags &= ~ AI_CANONIDN;
++#endif
+ 
+ 	/* Support being called using `ping4` or `ping6` symlinks */
+ 	if (argv[0][strlen(argv[0])-1] == '4')
+-- 
+2.18.0
+
