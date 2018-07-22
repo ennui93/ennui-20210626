@@ -143,6 +143,7 @@ RDEPEND="${RDEPEND}
 # 1. List all the working slots (with min versions) in ||, newest first.
 # 2. Update the := to specify *max* version, e.g. < 7.
 # 3. Specify LLVM_MAX_SLOT, e.g. 6.
+LLVM_MAX_SLOT="6"
 LLVM_DEPSTR="
 	|| (
 		sys-devel/llvm:7[${MULTILIB_USEDEP}]
@@ -271,10 +272,14 @@ pkg_setup() {
 
 src_prepare() {
 	eapply "${FILESDIR}"/${PN}-18-execinfo.patch
+	eapply "${FILESDIR}"/${PN}-17-musl-string_h.patch
 	eapply "${FILESDIR}"/${PN}-17-musl-invocation_name.patch
 	eapply "${FILESDIR}"/${PN}-18-musl-pthread.patch
+	eapply "${FILESDIR}"/${PN}-18-intel-missing-time_t.patch
 
 	eapply_user
+	[[ ${PV} == 9999 ]] && eautoreconf
+
 	eautoreconf
 }
 
