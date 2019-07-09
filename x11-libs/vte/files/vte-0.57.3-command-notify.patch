@@ -1,0 +1,254 @@
+diff --git a/bindings/vala/app.vala b/bindings/vala/app.vala
+index fc26c2b0..634b8dde 100644
+--- a/bindings/vala/app.vala
++++ b/bindings/vala/app.vala
+@@ -309,6 +309,8 @@ class Window : Gtk.ApplicationWindow
+     if (Options.object_notifications)
+       terminal.notify.connect(notify_cb);
+ 
++    terminal.notification_received.connect(notification_received_cb);
++
+     /* Settings */
+     if (Options.no_double_buffer)
+       terminal.set_double_buffered(false);
+@@ -780,6 +782,11 @@ class Window : Gtk.ApplicationWindow
+     set_title(terminal.get_window_title());
+   }
+ 
++  private void notification_received_cb(Vte.Terminal terminal, string summary, string? body)
++  {
++    print ("[%s]: %s\n", summary, body);
++  }
++
+ } /* class Window */
+ 
+ class App : Gtk.Application
+diff --git a/src/app/app.cc b/src/app/app.cc
+index d845b5ce..90148baf 100644
+--- a/src/app/app.cc
++++ b/src/app/app.cc
+@@ -1679,6 +1679,14 @@ window_window_title_changed_cb(VteTerminal* terminal,
+                              vte_terminal_get_window_title(window->terminal));
+ }
+ 
++static void
++notification_received_cb(VteTerminal *terminal,
++                         const gchar *summary,
++                         const gchar *body)
++{
++        g_print("[%s]: %s\n", summary, body);
++}
++
+ static void
+ window_lower_window_cb(VteTerminal* terminal,
+                        VteappWindow* window)
+@@ -1907,6 +1915,8 @@ vteapp_window_constructed(GObject *object)
+         if (options.object_notifications)
+                 g_signal_connect(window->terminal, "notify", G_CALLBACK(window_notify_cb), window);
+ 
++        g_signal_connect(window->terminal, "notification-received", G_CALLBACK(notification_received_cb), NULL);
++
+         /* Settings */
+         if (options.no_double_buffer)
+                 gtk_widget_set_double_buffered(GTK_WIDGET(window->terminal), false);
+diff --git a/src/marshal.list b/src/marshal.list
+index 241128c3..4412cf3d 100644
+--- a/src/marshal.list
++++ b/src/marshal.list
+@@ -1,3 +1,4 @@
+ VOID:STRING,BOXED
++VOID:STRING,STRING
+ VOID:STRING,UINT
+ VOID:UINT,UINT
+diff --git a/src/vte.cc b/src/vte.cc
+index e7815b44..79d3248a 100644
+--- a/src/vte.cc
++++ b/src/vte.cc
+@@ -10696,6 +10696,15 @@ Terminal::emit_pending_signals()
+ 
+ 	emit_adjustment_changed();
+ 
++	if (m_notification_received) {
++                _vte_debug_print (VTE_DEBUG_SIGNALS,
++                                  "Emitting `notification-received'.\n");
++                g_signal_emit(object, signals[SIGNAL_NOTIFICATION_RECEIVED], 0,
++                              m_notification_summary.c_str(),
++                              m_notification_body.c_str());
++                m_notification_received = FALSE;
++	}
++
+ 	if (m_window_title_changed) {
+                 if (m_window_title != m_window_title_pending) {
+                         m_window_title.swap(m_window_title_pending);
+diff --git a/src/vte.sh b/src/vte.sh
+index c200493c..ee010aa3 100644
+--- a/src/vte.sh
++++ b/src/vte.sh
+@@ -50,10 +50,12 @@ __vte_osc7 () {
+ }
+ 
+ __vte_prompt_command() {
++  local command=$(HISTTIMEFORMAT= history 1 | sed 's/^ *[0-9]\+ *//')
++  command="${command//;/ }"
+   local pwd='~'
+   [ "$PWD" != "$HOME" ] && pwd=${PWD/#$HOME\//\~\/}
+   pwd="${pwd//[[:cntrl:]]}"
+-  printf "\033]0;%s@%s:%s\033\\%s" "${USER}" "${HOSTNAME%%.*}" "${pwd}" "$(__vte_osc7)"
++  printf '\033]777;notify;Command completed;%s\033\\\033]0;%s@%s:%s\033\\%s' "${command}" "${USER}" "${HOSTNAME%%.*}" "${pwd}" "$(__vte_osc7)"
+ }
+ 
+ case "$TERM" in
+diff --git a/src/vte/vteterminal.h b/src/vte/vteterminal.h
+index 18ac0714..ea5c9313 100644
+--- a/src/vte/vteterminal.h
++++ b/src/vte/vteterminal.h
+@@ -104,8 +104,10 @@ struct _VteTerminalClass {
+ 
+ 	void (*bell)(VteTerminal* terminal);
+ 
++	void (*notification_received)(VteTerminal* terminal, const gchar *summary, const gchar *body);
++
+         /* Padding for future expansion. */
+-        gpointer padding[16];
++        gpointer padding[15];
+ 
+         VteTerminalClassPrivate *priv;
+ };
+diff --git a/src/vtegtk.cc b/src/vtegtk.cc
+index c18a178a..61bc9c5a 100644
+--- a/src/vtegtk.cc
++++ b/src/vtegtk.cc
+@@ -739,6 +739,7 @@ vte_terminal_class_init(VteTerminalClass *klass)
+ 	klass->child_exited = NULL;
+ 	klass->encoding_changed = NULL;
+ 	klass->char_size_changed = NULL;
++	klass->notification_received = NULL;
+ 	klass->window_title_changed = NULL;
+ 	klass->icon_title_changed = NULL;
+ 	klass->selection_changed = NULL;
+@@ -820,6 +821,29 @@ vte_terminal_class_init(VteTerminalClass *klass)
+                                    G_OBJECT_CLASS_TYPE(klass),
+                                    g_cclosure_marshal_VOID__INTv);
+ 
++        /**
++         * VteTerminal::notification-received:
++         * @vteterminal: the object which received the signal
++         * @summary: The summary
++         * @body: (allow-none): Extra optional text
++         *
++         * Emitted when a process running in the terminal wants to
++         * send a notification to the desktop environment.
++         */
++        signals[SIGNAL_NOTIFICATION_RECEIVED] =
++                g_signal_new(I_("notification-received"),
++                             G_OBJECT_CLASS_TYPE(klass),
++                             G_SIGNAL_RUN_LAST,
++                             G_STRUCT_OFFSET(VteTerminalClass, notification_received),
++                             NULL,
++                             NULL,
++                             _vte_marshal_VOID__STRING_STRING,,
++                             G_TYPE_NONE,
++                             2, G_TYPE_STRING, G_TYPE_STRING);
++         g_signal_set_va_marshaller(signals[SIGNAL_NOTIFICATION_RECEIVED],
++                                   G_OBJECT_CLASS_TYPE(klass),
++                                   _vte_marshal_VOID__STRING_STRINGv);
++
+         /**
+          * VteTerminal::window-title-changed:
+          * @vteterminal: the object which received the signal
+diff --git a/src/vtegtk.hh b/src/vtegtk.hh
+index e2515b34..c175f6d7 100644
+--- a/src/vtegtk.hh
++++ b/src/vtegtk.hh
+@@ -56,6 +56,7 @@ enum {
+         SIGNAL_TEXT_INSERTED,
+         SIGNAL_TEXT_MODIFIED,
+         SIGNAL_TEXT_SCROLLED,
++        SIGNAL_NOTIFICATION_RECEIVED,
+         SIGNAL_WINDOW_TITLE_CHANGED,
+         LAST_SIGNAL
+ };
+diff --git a/src/vteinternal.hh b/src/vteinternal.hh
+index b0b6239e..c64b0540 100644
+--- a/src/vteinternal.hh
++++ b/src/vteinternal.hh
+@@ -560,6 +560,11 @@ public:
+         gboolean m_cursor_moved_pending;
+         gboolean m_contents_changed_pending;
+ 
++        /* desktop notification */
++        gboolean m_notification_received;
++        std::string m_notification_summary;
++        std::string m_notification_body;
++
+         std::string m_window_title{};
+         std::string m_current_directory_uri{};
+         std::string m_current_file_uri{};
+@@ -1313,6 +1318,9 @@ public:
+                              int osc) noexcept;
+ 
+         /* OSC handlers */
++        void handle_urxvt_extension(vte::parser::Sequence const& seq,
++                                    vte::parser::StringTokeniser::const_iterator& token,
++                                    vte::parser::StringTokeniser::const_iterator const& endtoken) noexcept;
+         void set_color(vte::parser::Sequence const& seq,
+                        vte::parser::StringTokeniser::const_iterator& token,
+                        vte::parser::StringTokeniser::const_iterator const& endtoken,
+diff --git a/src/vteseq.cc b/src/vteseq.cc
+index 9ee15477..fb877f28 100644
+--- a/src/vteseq.cc
++++ b/src/vteseq.cc
+@@ -1398,6 +1398,34 @@ Terminal::delete_lines(vte::grid::row_t param)
+         m_text_deleted_flag = TRUE;
+ }
+ 
++void
++Terminal::handle_urxvt_extension(vte::parser::Sequence const& seq,
++                                 vte::parser::StringTokeniser::const_iterator& token,
++                                 vte::parser::StringTokeniser::const_iterator const& endtoken) noexcept
++{
++        if (token == endtoken) {
++                return;
++        }
++
++        if (*token == "notify") {
++                ++token;
++
++                if (token == endtoken)
++                        return;
++
++                m_notification_summary = *token;
++                m_notification_body.clear();
++                m_notification_received = TRUE;
++                ++token;
++
++                if (token == endtoken)
++                        return;
++
++                m_notification_body = *token;
++                return;
++        }
++}
++
+ bool
+ Terminal::get_osc_color_index(int osc,
+                                         int value,
+@@ -6488,6 +6516,10 @@ Terminal::OSC(vte::parser::Sequence const& seq)
+                 reset_color(VTE_HIGHLIGHT_FG, VTE_COLOR_SOURCE_ESCAPE);
+                 break;
+ 
++        case VTE_OSC_URXVT_EXTENSION:
++                handle_urxvt_extension(seq, it, cend);
++                break;
++
+         case VTE_OSC_XTERM_SET_ICON_TITLE:
+         case VTE_OSC_XTERM_SET_XPROPERTY:
+         case VTE_OSC_XTERM_SET_COLOR_MOUSE_CURSOR_FG:
+@@ -6528,7 +6560,6 @@ Terminal::OSC(vte::parser::Sequence const& seq)
+         case VTE_OSC_URXVT_SET_FONT_BOLD_ITALIC:
+         case VTE_OSC_URXVT_VIEW_UP:
+         case VTE_OSC_URXVT_VIEW_DOWN:
+-        case VTE_OSC_URXVT_EXTENSION:
+         case VTE_OSC_YF_RQGWR:
+         default:
+                 break;
