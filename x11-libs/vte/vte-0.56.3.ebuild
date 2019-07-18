@@ -59,7 +59,7 @@ src_prepare() {
 
 	# Expose additional APIs from VTE.
 	# See https://github.com/Thestinger/termite#dependencies for more information.
-	eapply "${FILESDIR}"/${PN}-ng-0.56.2.patch.patch
+	eapply "${FILESDIR}"/${PN}-ng-0.56.2.patch
 
 	gnome2_src_prepare
 }
