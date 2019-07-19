@@ -28,6 +28,7 @@ DEPEND="${RDEPEND}
 
 PATCHES=(
 	"${FILESDIR}"/${PV}-bash-completion-dir.patch
+	"${FILESDIR}"/${P}-disable-dbus.patch
 )
 
 src_prepare() {

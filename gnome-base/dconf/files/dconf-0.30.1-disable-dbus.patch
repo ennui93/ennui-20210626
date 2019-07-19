@@ -1,0 +1,40 @@
+diff --git a/meson.build b/meson.build
+index f5bbbcf..7fa8a38 100644
+--- a/meson.build
++++ b/meson.build
+@@ -46,7 +46,8 @@ gio_unix_dep = dependency('gio-unix-2.0', version: gio_req_version)
+ glib_dep = dependency('glib-2.0', version: '>= 2.44.0')
+ 
+ gio_module_dir = gio_dep.get_pkgconfig_variable('giomoduledir', define_variable: ['libdir', dconf_libdir])
+-dbus_session_service_dir = dependency('dbus-1').get_pkgconfig_variable('session_bus_services_dir', define_variable: ['datadir', dconf_datadir])
++# Disable DBUS from build
++#dbus_session_service_dir = dependency('dbus-1').get_pkgconfig_variable('session_bus_services_dir', define_variable: ['datadir', dconf_datadir])
+ 
+ enable_bash_completion = get_option('bash_completion')
+ if enable_bash_completion
+diff --git a/service/meson.build b/service/meson.build
+index d92b982..e5b0621 100644
+--- a/service/meson.build
++++ b/service/meson.build
+@@ -3,13 +3,14 @@ service_conf.set('libexecdir', dconf_libexecdir)
+ 
+ service = dconf_namespace + '.service'
+ 
+-configure_file(
+-  input: service + '.in',
+-  output: service,
+-  configuration: service_conf,
+-  install: true,
+-  install_dir: dbus_session_service_dir,
+-)
++# Disable DBUS from build
++#configure_file(
++#  input: service + '.in',
++#  output: service,
++#  configuration: service_conf,
++#  install: true,
++#  install_dir: dbus_session_service_dir,
++#)
+ 
+ lib_sources = [
+   'dconf-blame.c',
