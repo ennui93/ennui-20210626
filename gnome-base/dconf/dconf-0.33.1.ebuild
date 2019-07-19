@@ -27,7 +27,7 @@ DEPEND="${RDEPEND}
 "
 
 PATCHES=(
-	"${FILESDIR}"/${PV}-bash-completion-dir.patch
+	"${FILESDIR}"/0.30.1-bash-completion-dir.patch
 	"${FILESDIR}"/${P}-disable-dbus.patch
 )
 
