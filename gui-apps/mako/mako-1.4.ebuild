@@ -24,10 +24,6 @@ DEPEND="
 	dev-libs/wayland
 	x11-libs/pango
 	x11-libs/cairo
-	|| (
-		sys-apps/systemd
-		sys-auth/elogind
-	)
 	icons? (
 		x11-libs/gtk+:3
 		x11-libs/gdk-pixbuf
