@@ -1,24 +1,23 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2021 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
-GNOME2_LA_PUNT="yes"
+EAPI=7
 GNOME2_EAUTORECONF="yes"
 
-inherit flag-o-matic gnome2 multilib virtualx multilib-minimal
+inherit gnome2 multilib multilib-minimal virtualx
 
 DESCRIPTION="Gimp ToolKit +"
 HOMEPAGE="https://www.gtk.org/"
 
 LICENSE="LGPL-2+"
 SLOT="3"
-IUSE="aqua broadway cloudprint colord cups examples gtk-doc +introspection test vim-syntax wayland +X xinerama"
+IUSE="aqua broadway cloudprint colord cups examples gtk-doc +introspection sysprof test vim-syntax wayland +X xinerama"
 REQUIRED_USE="
 	|| ( aqua wayland X )
 	xinerama? ( X )
 "
 
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha amd64 arm arm64 ~hppa ~ia64 ~mips ppc ppc64 ~riscv ~s390 sparc x86 ~amd64-linux ~x86-linux ~ppc-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 
 # Upstream wants us to do their job:
 # https://bugzilla.gnome.org/show_bug.cgi?id=768662#c1
@@ -27,62 +26,56 @@ RESTRICT="test"
 # FIXME: introspection data is built against system installation of gtk+:3,
 # bug #????
 COMMON_DEPEND="
-	>=dev-libs/atk-2.15[introspection?,${MULTILIB_USEDEP}]
+	>=dev-libs/atk-2.32.0[introspection?,${MULTILIB_USEDEP}]
 	>=dev-libs/fribidi-0.19.7[${MULTILIB_USEDEP}]
-	>=dev-libs/glib-2.53.4:2[${MULTILIB_USEDEP}]
+	>=dev-libs/glib-2.57.2:2[${MULTILIB_USEDEP}]
 	media-libs/fontconfig[${MULTILIB_USEDEP}]
+	>=media-libs/harfbuzz-0.9:=
 	>=media-libs/libepoxy-1.4[X(+)?,${MULTILIB_USEDEP}]
+	virtual/libintl[${MULTILIB_USEDEP}]
 	>=x11-libs/cairo-1.14[aqua?,glib,svg,X?,${MULTILIB_USEDEP}]
 	>=x11-libs/gdk-pixbuf-2.30:2[introspection?,${MULTILIB_USEDEP}]
 	>=x11-libs/pango-1.41.0[introspection?,${MULTILIB_USEDEP}]
-	>=media-libs/harfbuzz-0.9:=
 	x11-misc/shared-mime-info
 
 	cloudprint? (
+		>=dev-libs/json-glib-1.0[${MULTILIB_USEDEP}]
 		>=net-libs/rest-0.7[${MULTILIB_USEDEP}]
-		>=dev-libs/json-glib-1.0[${MULTILIB_USEDEP}] )
+	)
 	colord? ( >=x11-misc/colord-0.1.9:0=[${MULTILIB_USEDEP}] )
 	cups? ( >=net-print/cups-2.0[${MULTILIB_USEDEP}] )
 	introspection? ( >=dev-libs/gobject-introspection-1.39:= )
+	sysprof? ( >=dev-util/sysprof-capture-3.33.2:3[${MULTILIB_USEDEP}] )
 	wayland? (
-		>=dev-libs/wayland-1.9.91[${MULTILIB_USEDEP}]
-		>=dev-libs/wayland-protocols-1.12
+		>=dev-libs/wayland-1.14.91[${MULTILIB_USEDEP}]
+		>=dev-libs/wayland-protocols-1.17
 		media-libs/mesa[wayland,${MULTILIB_USEDEP}]
 		>=x11-libs/libxkbcommon-0.2[${MULTILIB_USEDEP}]
 	)
 	X? (
+		media-libs/mesa[X(+),${MULTILIB_USEDEP}]
 		x11-libs/libX11[${MULTILIB_USEDEP}]
-		>=x11-libs/libXi-1.3[${MULTILIB_USEDEP}]
-		x11-libs/libXext[${MULTILIB_USEDEP}]
-		>=x11-libs/libXrandr-1.5[${MULTILIB_USEDEP}]
-		x11-libs/libXcursor[${MULTILIB_USEDEP}]
-		x11-libs/libXfixes[${MULTILIB_USEDEP}]
 		x11-libs/libXcomposite[${MULTILIB_USEDEP}]
+		x11-libs/libXcursor[${MULTILIB_USEDEP}]
 		x11-libs/libXdamage[${MULTILIB_USEDEP}]
+		x11-libs/libXext[${MULTILIB_USEDEP}]
+		x11-libs/libXfixes[${MULTILIB_USEDEP}]
+		>=x11-libs/libXi-1.3[${MULTILIB_USEDEP}]
+		>=x11-libs/libXrandr-1.5[${MULTILIB_USEDEP}]
 		xinerama? ( x11-libs/libXinerama[${MULTILIB_USEDEP}] )
 	)
 "
 DEPEND="${COMMON_DEPEND}
-	app-text/docbook-xsl-stylesheets
-	app-text/docbook-xml-dtd:4.1.2
-	dev-libs/libxslt
-	dev-libs/gobject-introspection-common
-	>=dev-util/gdbus-codegen-2.48
-	dev-util/glib-utils
-	>=dev-util/gtk-doc-am-1.20
-	gtk-doc? ( >=dev-util/gtk-doc-1.20 )
-	>=sys-devel/gettext-0.19.7[${MULTILIB_USEDEP}]
-	virtual/pkgconfig[${MULTILIB_USEDEP}]
-	X? ( x11-base/xorg-proto )
 	test? (
+		media-fonts/font-cursor-misc
 		media-fonts/font-misc-misc
-		media-fonts/font-cursor-misc )
+	)
+	X? ( x11-base/xorg-proto )
 "
 # gtk+-3.2.2 breaks Alt key handling in <=x11-libs/vte-0.30.1:2.90
 # gtk+-3.3.18 breaks scrolling in <=x11-libs/vte-0.31.0:2.90
 RDEPEND="${COMMON_DEPEND}
 	>=dev-util/gtk-update-icon-cache-3
-	!<gnome-base/gail-1000
 	!<x11-libs/vte-0.31.0:2.90
 "
 # librsvg for svg icons (PDEPEND to avoid circular dep), bug #547710
@@ -91,9 +84,34 @@ PDEPEND="
 	>=x11-themes/adwaita-icon-theme-3.14
 	vim-syntax? ( app-vim/gtk-syntax )
 "
+BDEPEND="
+	app-text/docbook-xml-dtd:4.1.2
+	app-text/docbook-xsl-stylesheets
+	dev-libs/gobject-introspection-common
+	dev-libs/libxslt
+	>=dev-util/gdbus-codegen-2.48
+	dev-util/glib-utils
+	>=dev-util/gtk-doc-am-1.20
+	wayland? ( dev-util/wayland-scanner )
+	>=sys-devel/gettext-0.19.7
+	virtual/pkgconfig
+	x11-libs/gdk-pixbuf:2
+	gtk-doc? (
+		app-text/docbook-xml-dtd:4.3
+		>=dev-util/gtk-doc-1.20
+	)
+"
 
 MULTILIB_CHOST_TOOLS=(
 	/usr/bin/gtk-query-immodules-3.0$(get_exeext)
+)
+
+PATCHES=(
+	# gtk-update-icon-cache is installed by dev-util/gtk-update-icon-cache
+	"${FILESDIR}"/${PN}-3.24.25-update-icon-cache.patch
+
+	# Fix broken autotools logic
+	"${FILESDIR}"/${PN}-3.22.20-libcloudproviders-automagic.patch
 )
 
 strip_builddir() {
@@ -121,15 +139,6 @@ src_prepare() {
 		strip_builddir SRC_SUBDIRS examples Makefile.{am,in}
 	fi
 
-	# gtk-update-icon-cache is installed by dev-util/gtk-update-icon-cache
-	eapply "${FILESDIR}"/${PN}-3.24.8-update-icon-cache.patch
-
-	# Fix broken autotools logic
-	eapply "${FILESDIR}"/${PN}-3.22.20-libcloudproviders-automagic.patch
-
-	# Re-enable config option to remove atk-bridge dependency
-	eapply "${FILESDIR}"/${PN}-3.22.30.atk-bridge.patch
-
 	gnome2_src_prepare
 }
 
@@ -142,6 +151,7 @@ multilib_src_configure() {
 		$(use_enable cups cups auto)
 		$(multilib_native_use_enable gtk-doc)
 		$(multilib_native_use_enable introspection)
+		$(use_enable sysprof profiler)
 		$(use_enable wayland wayland-backend)
 		$(use_enable X x11-backend)
 		$(use_enable X xcomposite)
@@ -150,13 +160,9 @@ multilib_src_configure() {
 		$(use_enable X xkb)
 		$(use_enable X xrandr)
 		$(use_enable xinerama)
-		--without-atk-bridge
 		# cloudprovider is not packaged in Gentoo yet
 		--disable-cloudproviders
-		--disable-mir-backend
 		--disable-papi
-		# sysprof integration needs >=sysprof-3.33.2
-		--disable-profiler
 		--enable-man
 		--with-xml-catalog="${EPREFIX}"/etc/xml/catalog
 		# need libdir here to avoid a double slash in a path that libtool doesn't
@@ -198,8 +204,8 @@ multilib_src_install() {
 multilib_src_install_all() {
 	insinto /etc/gtk-3.0
 	doins "${FILESDIR}"/settings.ini
-	# Skip README.{in,commits,win32} and useless ChangeLog that would get installed by default
-	DOCS=( AUTHORS NEWS README )
+	# Skip README.{in,commits,win32} that would get installed by default
+	DOCS=( AUTHORS ChangeLog NEWS README )
 	einstalldocs
 }
 
@@ -208,12 +214,12 @@ pkg_preinst() {
 
 	multilib_pkg_preinst() {
 		# Make immodules.cache belongs to gtk+ alone
-		local cache="usr/$(get_libdir)/gtk-3.0/3.0.0/immodules.cache"
+		local cache="/usr/$(get_libdir)/gtk-3.0/3.0.0/immodules.cache"
 
 		if [[ -e ${EROOT}${cache} ]]; then
-			cp "${EROOT}"${cache} "${ED}"/${cache} || die
+			cp "${EROOT}${cache}" "${ED}${cache}" || die
 		else
-			touch "${ED}"/${cache} || die
+			touch "${ED}${cache}" || die
 		fi
 	}
 	multilib_parallel_foreach_abi multilib_pkg_preinst
@@ -240,7 +246,7 @@ pkg_postrm() {
 
 	if [[ -z ${REPLACED_BY_VERSION} ]]; then
 		multilib_pkg_postrm() {
-			rm -f "${EROOT}"usr/$(get_libdir)/gtk-3.0/3.0.0/immodules.cache
+			rm -f "${EROOT}/usr/$(get_libdir)/gtk-3.0/3.0.0/immodules.cache"
 		}
 		multilib_foreach_abi multilib_pkg_postrm
 	fi
