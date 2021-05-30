@@ -139,6 +139,9 @@ src_prepare() {
 		strip_builddir SRC_SUBDIRS examples Makefile.{am,in}
 	fi
 
+	# Re-enable config option to remove atk-bridge dependency
+	eapply "${FILESDIR}"/${PN}-3.22.30.atk-bridge.patch
+
 	gnome2_src_prepare
 }
 
@@ -160,6 +163,7 @@ multilib_src_configure() {
 		$(use_enable X xkb)
 		$(use_enable X xrandr)
 		$(use_enable xinerama)
+		--without-atk-bridge
 		# cloudprovider is not packaged in Gentoo yet
 		--disable-cloudproviders
 		--disable-papi
